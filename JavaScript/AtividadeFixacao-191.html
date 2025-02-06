@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculo</title>
+</head>
+<body>
+    <script>
+        var num1 = prompt('digite o primeiro:');
+        var num2 = prompt('digite o segundo numero:');
+        var acao = prompt('digite qual ação será feita:');
+        var resultado = null
+
+        if (acao === "-"){
+            resultado = (parseInt(num1) - parseInt(num2))
+            document.write(resultado)
+
+        }if(acao === "+"){
+            resultado =  (parseInt(num1) + parseInt(num2))
+            document.write(resultado)
+        }if(acao === "+" || acao === "-"){
+            alert("Utilize uma ação valida")
+        }
+
+
+
+
+
+
+    </script>
+</body>
+</html>

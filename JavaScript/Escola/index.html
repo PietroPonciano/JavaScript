@@ -1,0 +1,351 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+    <title>Cálculo de Notas</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: rgb(88, 88, 88);
+            color: rgb(255, 255, 255);
+        }
+
+        #navbar {
+            display: flex;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            justify-content: center;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        #navbar h2 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 100px auto 20px auto; /* Ajuste de margem para navbar */
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 8px;
+        }
+
+        input {
+            margin: 5px 0;
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: none;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%; /* Botão de largura total */
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #ffffff;
+        }
+
+        .error {
+            color: red; /* Classe para erro */
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                margin: 20px;
+            }
+
+            button {
+                padding: 12px;
+            }
+
+            footer {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="navbar">
+        <h2>Faça a média das suas notas</h2>
+    </div>
+
+    <div class="container">
+        <h1>Cálculo de Notas</h1>
+        <label for="trimestre">Qual trimestre você está? (1, 2, 3 ou então use 4 para redação)</label>
+        <input type="number" id="trimestre" min="1" max="4" />
+
+        <div id="aaStSimContainer" class="hidden">
+            <label for="aa" id="label-aa">Qual sua nota na AA?</label>
+            <input type="number" id="aa" min="0" max="100" oninput="verificarCampo('aa', 'label-aa')" />
+            <label for="st" id="label-st">Qual sua nota na ST?</label>
+            <input type="number" id="st" min="0" max="100" oninput="verificarCampo('st', 'label-st')" />
+            <label for="sim" id="label-sim">Qual sua nota na SIM?</label>
+            <input type="number" id="sim" min="0" max="100" oninput="verificarCampo('sim', 'label-sim')" />
+        </div>
+
+        <div id="afContainer" class="hidden">
+            <label for="afCount">Quantas AFs você teve?</label>
+            <input type="number" id="afCount" min="1" max="6" oninput="mostrarInputs(this.value)" />
+            <div id="inputsContainer"></div>
+            <button onclick="calcularNota()">Calcular Nota Final</button>
+        </div>
+
+        <div id="trimestre3Container" class="hidden">
+            <label for="nota1" id="label-nota1">Qual sua nota final do primeiro trimestre?</label>
+            <input type="number" id="nota1" min="0" max="100" oninput="verificarCampo('nota1', 'label-nota1')" />
+            <label for="nota2" id="label-nota2">Qual sua nota final do segundo trimestre?</label>
+            <input type="number" id="nota2" min="0" max="100" oninput="verificarCampo('nota2', 'label-nota2')" />
+            <button onclick="calcularNotaTrimestre3()">Calcular Nota Necessária</button>
+        </div>
+
+        <div id="trimestre4Container" class="hidden">
+            <label for="aa4" id="label-aa4">Qual sua nota na AA no trimestre?</label>
+            <input type="number" id="aa4" min="0" max="100" oninput="verificarCampo('aa4', 'label-aa4')" />
+            <label for="sim4" id="label-sim4">Qual sua nota na SIM no trimestre?</label>
+            <input type="number" id="sim4" min="0" max="100" oninput="verificarCampo('sim4', 'label-sim4')" />
+            <label for="afCount4">Quantas AFs você teve no trimestre?</label>
+            <input type="number" id="afCount4" min="1" max="12" oninput="mostrarInputsTrimestre4(this.value)" />
+            <div id="inputsContainer4"></div>
+            <button onclick="calcularNotaTrimestre4()">Calcular Nota Final do trimestre</button>
+        </div>
+
+        <div class="result" id="resultado"></div>
+    </div>
+
+    <footer>
+        &copy; Pietro Ponciano - 2024 Cálculo de Notas. Todos os direitos reservados.
+    </footer>
+
+    <script id="oculto">
+        document.getElementById('trimestre').addEventListener('input', function() {
+            const trimestre = parseInt(this.value);
+            document.getElementById('aaStSimContainer').classList.toggle('hidden', trimestre !== 1 && trimestre !== 2);
+            document.getElementById('afContainer').classList.toggle('hidden', trimestre !== 1 && trimestre !== 2);
+            document.getElementById('trimestre3Container').classList.toggle('hidden', trimestre !== 3);
+            document.getElementById('trimestre4Container').classList.toggle('hidden', trimestre !== 4);
+        });
+
+        function verificarCampo(campoId, labelId) {
+            const valor = document.getElementById(campoId).value;
+            const label = document.getElementById(labelId);
+            if (valor === "" || valor < 0 || valor > 100) {
+                label.classList.add('error');
+            } else {
+                label.classList.remove('error');
+            }
+        }
+
+        function mostrarInputs(qtdAFs) {
+            const container = document.getElementById('inputsContainer');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= qtdAFs; i++) {
+                container.innerHTML += `
+                    <label for="af${i}" id="label-af${i}">Qual sua nota na AF${i}?</label>
+                    <input type="number" id="af${i}" min="0" max="100" oninput="verificarCampo('af${i}', 'label-af${i}')" />
+                `;
+            }
+        }
+
+        document.getElementById('afCount4').addEventListener('input', function() {
+            const qtdAFs = parseInt(this.value);
+            const container4 = document.getElementById('inputsContainer4');
+            container4.innerHTML = '';
+
+            for (let i = 1; i <= qtdAFs; i++) {
+                container4.innerHTML += `
+                    <label for="af4_${i}" id="label-af4_${i}">Qual sua nota na AF${i} do trimestre?</label>
+                    <input type="number" id="af4_${i}" min="0" max="100" oninput="verificarCampo('af4_${i}', 'label-af4_${i}')" />
+                `;
+            }
+        });
+
+        function calcularNota() {
+    const a = parseInt(document.getElementById('afCount').value);
+    const aa = parseFloat(document.getElementById('aa').value);
+    const st = parseFloat(document.getElementById('st').value);
+    const sim = parseFloat(document.getElementById('sim').value);
+
+    if (!verificarCampos(['aa', 'st', 'sim', 'afCount'])) {
+        return;
+    }
+
+    if (a >= 1 && a <= 6) {
+        let afs = [];
+        for (let i = 1; i <= a; i++) {
+            const notaAF = parseFloat(document.getElementById(`af${i}`).value);
+            if (notaAF < 0 || notaAF > 100) {
+                document.getElementById('resultado').innerText = 'As notas devem estar entre 0 e 100.';
+                return;
+            }
+            afs.push(notaAF);
+        }
+
+        const nota1 = aa + st + sim; // Soma das notas AA, ST e SIM
+        const nota2 = afs.reduce((a, b) => a + b, 0); // Soma das notas das AFs
+        const notaFinal = (nota1 + (nota2 / a)) / 4; // Cálculo da média final
+
+        document.getElementById('resultado').innerText = `Sua nota final é ${notaFinal.toFixed(2)}`;
+    } else {
+        document.getElementById('resultado').innerText = 'Por favor, insira um número válido de AFs.';
+    }
+}
+
+function verificarCampos(campos) {
+    let valido = true;
+    campos.forEach(campo => {
+        const valor = document.getElementById(campo).value;
+        if (valor === "" || valor < 0 || valor > 100) {
+            valido = false;
+            document.getElementById(campo).classList.add('error');
+        } else {
+            document.getElementById(campo).classList.remove('error');
+        }
+    });
+    return valido;
+}
+
+        function verificarCampos(campos) {
+            let valido = true;
+            campos.forEach(campo => {
+                const valor = document.getElementById(campo).value;
+                if (valor === "" || valor < 0 || valor > 100) {
+                    valido = false;
+                    document.getElementById(campo).classList.add('error');
+                } else {
+                    document.getElementById(campo).classList.remove('error');
+                }
+            });
+            return valido;
+        }
+
+        function calcularNotaTrimestre3() {
+            const b = parseFloat(document.getElementById('nota1').value);
+            const c = parseFloat(document.getElementById('nota2').value);
+
+            if (!verificarCampos(['nota1', 'nota2'])) {
+                return;
+            }
+
+            const notaNecessaria = (210) - (b + c);
+            document.getElementById('resultado').innerText = `Você precisa de ${notaNecessaria.toFixed(2)} para passar de ano`;
+        }
+
+        function calcularNotaTrimestre4() {
+    const aa = parseFloat(document.getElementById('aa4').value);
+    const sim = parseFloat(document.getElementById('sim4').value);
+    const a = parseInt(document.getElementById('afCount4').value);
+    let afs = [];
+
+    const maxAFs = 12; // Limite para o 4º trimestre
+
+    if (a > maxAFs) {
+        document.getElementById('resultado').innerText = `A quantidade máxima de AFs é ${maxAFs}.`;
+        return;
+    }
+
+    if (aa < 0 || aa > 100 || sim < 0 || sim > 100) {
+        document.getElementById('resultado').innerText = 'As notas AA e SIM devem estar entre 0 e 100.';
+        return;
+    }
+
+    for (let i = 1; i <= a; i++) {
+        const notaAF = parseFloat(document.getElementById(`af4_${i}`).value);
+        if (notaAF < 0 || notaAF > 100) {
+            document.getElementById('resultado').innerText = 'Todas as notas devem estar entre 0 e 100.';
+            return;
+        }
+        afs.push(notaAF);
+    }
+
+    const somaAFs = afs.reduce((a, b) => a + b, 0);
+    const mediaAFs = somaAFs / a;
+
+    const notaFinal = (aa + sim + mediaAFs) / 3;
+    document.getElementById('resultado').innerText = `Sua nota final do trimestre é ${notaFinal.toFixed(2)}`;
+}
+
+    function mostrarInputs(qtdAFs) {
+        const container = document.getElementById('inputsContainer');
+        container.innerHTML = '';
+        const maxAFs = 6; // Limite para 1º e 2º trimestres
+
+        if (qtdAFs > maxAFs) {
+            document.getElementById('resultado').innerText = `A quantidade máxima de AFs é ${maxAFs}.`;
+            return;
+        }
+
+        for (let i = 1; i <= qtdAFs; i++) {
+            container.innerHTML += `
+                <label for="af${i}" id="label-af${i}">Qual sua nota na AF${i}?</label>
+                <input type="number" id="af${i}" min="0" max="100" oninput="verificarCampo('af${i}', 'label-af${i}')" />
+            `;
+        }
+    }
+
+    document.getElementById('afCount4').addEventListener('input', function() {
+        const qtdAFs = parseInt(this.value);
+        const container4 = document.getElementById('inputsContainer4');
+        container4.innerHTML = '';
+        const maxAFs = 12; // Limite para o 4º trimestre
+
+        if (qtdAFs > maxAFs) {
+            document.getElementById('resultado').innerText = `A quantidade máxima de AFs é ${maxAFs}.`;
+            return;
+        }
+
+        for (let i = 1; i <= qtdAFs; i++) {
+            container4.innerHTML += `
+                <label for="af4_${i}" id="label-af4_${i}">Qual sua nota na AF${i} do trimestre?</label>
+                <input type="number" id="af4_${i}" min="0" max="100" oninput="verificarCampo('af4_${i}', 'label-af4_${i}')" />
+            `;
+        }
+        
+    });
+    </script>
+
+    
+</body>
+</html>

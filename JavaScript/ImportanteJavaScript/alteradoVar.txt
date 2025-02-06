@@ -1,0 +1,4 @@
+var teste1 = null
+console.log()
+teste1 = 'mudou seu valor'
+console.log()

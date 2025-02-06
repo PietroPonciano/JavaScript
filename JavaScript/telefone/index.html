@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificador de Telefone</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        input {
+            width: 200px;
+            padding: 10px;
+            margin-right: 10px;
+        }
+
+        button {
+            padding: 10px 15px;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verificador de Telefone</h1>
+        <input type="text" id="telefone" placeholder="Digite o número de telefone">
+        <button onclick="verificarTelefone()">Verificar</button>
+        <p id="resultado"></p>
+    </div>
+    <script>
+        function verificarTelefone() {
+            const telefone = document.getElementById('telefone').value;
+            const resultado = document.getElementById('resultado');
+
+            // Remove caracteres não numéricos
+            const telefoneFormatado = telefone.replace(/\D/g, '');
+
+            // Verifica se o número é um celular
+            const celularRegex = /^(?:\+55)?(?:[1-9][0-9]?)(?:[9][0-9]{8})$/;
+
+            if (celularRegex.test(telefoneFormatado)) {
+                resultado.textContent = 'O número é de celular.';
+            } else {
+                resultado.textContent = 'O número NÃO é de celular.';
+            }
+        }
+    </script>
+</body>
+</html>

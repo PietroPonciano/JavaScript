@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio - Aula 180</title>
+</head>
+<script>
+    var nome = prompt('digite seu nome:')
+    var altura = prompt('digite sua altura em cm:')
+    var peso = prompt('digite seu peso em kg:')
+    var classificacao = ''
+    altura = parseFloat(altura);
+    peso = parseFloat(peso);
+    altura = altura / 100
+    m = peso / altura*altura
+    
+
+    
+
+    
+
+    if (m < 16){
+        document.write('Magreza grave')
+
+    }else if(m >= 16 || M <= 16,99){
+        classificacao = 'Magreza moderada'
+    }else if(m >= 17 || m <= 18,49){
+        classificacao = 'Magreza leve'
+    }else if(m >= 18,50 || m <= 24,49){
+        classificacao = 'Peso normal'
+    }else if(m >= 25 || m <= 29,99){
+        classificacao = 'Sobrepeso'
+    }else if(m >= 30 || m <= 34,49){
+        classificacao = 'Obesidade grau I '
+    }else if(m >= 35 || m <= 39,99){
+        classificacao = 'Obesidade grau II'
+    }else if(m > 40){
+        classificacao = 'Obesidade grau III'
+    }
+    document.write(nome + ' possui índice de massa corporal igual a ' + m + ', sendo classificado como:' + classificacao)
+    console.log(classificacao)
+</script>
+<body>
+    
+</body>
+</html>
