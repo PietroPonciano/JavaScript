@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cálculo de Nota</title>
+  <style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: #f8fafc;
+  color: #333;
+  padding: 20px;
+}
+
+h1 {
+  text-align: center;
+  color: #34495e;
+  font-size: 2.8rem;
+  margin-bottom: 30px;
+  font-weight: 700;
+}
+
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+label {
+  font-size: 1.2rem;
+  color: #34495e;
+  margin-bottom: 8px;
+  display: block;
+}
+
+input[type="number"], input[type="text"] {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 18px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #f7f7f7;
+  transition: all 0.3s ease;
+}
+
+input.error {
+  border-color: #e74c3c;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3498db;
+  background-color: #fff;
+  box-shadow: 0 0 8px rgba(52, 152, 219, 0.3);
+}
+
+button {
+  width: 100%;
+  padding: 18px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #ecf0f1;
+  border-radius: 8px;
+  font-weight: 600;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #34495e;
+}
+
+.error {
+  color: #e74c3c;
+  font-size: 1rem;
+  text-align: center;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  label {
+    font-size: 1.1rem;
+  }
+
+  input[type="number"], input[type="text"] {
+    padding: 12px;
+    font-size: 1rem;
+  }
+
+  button {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  label {
+    font-size: 1rem;
+  }
+
+  input[type="number"], input[type="text"] {
+    padding: 10px;
+    font-size: 0.95rem;
+  }
+
+  button {
+    font-size: 1rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <h1>Cálculo de Nota</h1>
+  <div class="container">
+    <label for="materia">Qual é a matéria a ser calculada?</label>
+    <input type="text" id="materia" placeholder="Ex: Matemática">
+
+    <label for="N">Quantos engajamentos você teve?</label>
+    <input type="number" id="N" placeholder="Digite um número" min="1">
+
+    <div id="engajamentosContainer"></div>
+
+    <label for="simuladosFechados">Quantos simulados fechados você teve?</label>
+    <input type="number" id="simuladosFechados" placeholder="Digite um número" min="0">
+
+    <div id="simuladosFechadosContainer"></div>
+
+    <label for="bonus">Você recebeu algum bônus? (sim/não)</label>
+    <input type="text" id="bonus" placeholder="Ex: sim ou não">
+
+    <label for="simuladosAbertos">Quantos simulados abertos você teve?</label>
+    <input type="number" id="simuladosAbertos" placeholder="Digite um número" min="0">
+
+    <div id="simuladosAbertosContainer"></div>
+
+    <button onclick="calcularNota()">Calcular Nota</button>
+
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <script>
+    // Função para gerar campos dinâmicos de engajamento, simulados fechados e abertos
+    function gerarCamposDinamicos(tipo, quantidade) {
+      let container;
+      let labelPrefix;
+
+      if (tipo === 'engajamento') {
+        container = document.getElementById('engajamentosContainer');
+        labelPrefix = 'Engajamento';
+      } else if (tipo === 'simuladoFechado') {
+        container = document.getElementById('simuladosFechadosContainer');
+        labelPrefix = 'Simulado Fechado';
+      } else if (tipo === 'simuladoAberto') {
+        container = document.getElementById('simuladosAbertosContainer');
+        labelPrefix = 'Simulado Aberto';
+      }
+
+      // Limpar o conteúdo anterior
+      container.innerHTML = '';
+
+      for (let i = 0; i < quantidade; i++) {
+        let div = document.createElement('div');
+        div.innerHTML = `<label for="${tipo}${i}">${labelPrefix} ${i + 1}</label>
+                         <input type="number" id="${tipo}${i}" min="0" max="100" oninput="verificarCampo('${tipo}${i}')">`;
+        container.appendChild(div);
+      }
+    }
+
+    // Função que verifica se o valor está correto
+    function verificarCampo(campoId) {
+      const campo = document.getElementById(campoId);
+      const valor = campo.value;
+
+      if (valor === "" || valor < 0 || valor > 100) {
+        campo.classList.add('error');
+      } else {
+        campo.classList.remove('error');
+      }
+    }
+
+    // Função que calcula a nota
+    function calcularNota() {
+      let materia = document.getElementById('materia').value;
+      let N = parseInt(document.getElementById('N').value);
+      let s1 = parseInt(document.getElementById('simuladosFechados').value);
+      let s2 = parseInt(document.getElementById('simuladosAbertos').value);
+      let bonus = document.getElementById('bonus').value.toLowerCase();
+
+      let soma1 = 0, soma2 = 0, soma3 = 0;
+
+      // Validação dos campos obrigatórios
+      if (!materia || N < 1 || s1 < 0 || s2 < 0) {
+        document.getElementById('resultado').innerText = "Por favor, preencha todos os campos corretamente.";
+        return;
+      }
+
+      // Coletando os valores dos engajamentos
+      for (let i = 0; i < N; i++) {
+        let x = parseInt(document.getElementById('engajamento' + i).value);
+        if (!x || x < 0 || x > 100) {
+          document.getElementById('resultado').innerText = "Por favor, preencha todos os campos de engajamento corretamente.";
+          return;
+        }
+        soma1 += x;
+      }
+      soma1 = soma1 / N;
+
+      // Coletando os valores dos simulados fechados
+      for (let i = 0; i < s1; i++) {
+        let y = parseInt(document.getElementById('simuladoFechado' + i).value);
+        if (!y || y < 0 || y > 100) {
+          document.getElementById('resultado').innerText = "Por favor, preencha todos os campos de simulados fechados corretamente.";
+          return;
+        }
+        soma2 += y;
+      }
+      soma2 = soma2 / s1;
+
+      // Verificando o bônus
+      if (bonus === 'sim' || bonus === 's') {
+        soma2 += 5;
+      }
+
+      // Coletando os valores dos simulados abertos
+      for (let i = 0; i < s2; i++) {
+        let y = parseInt(document.getElementById('simuladoAberto' + i).value);
+        if (!y || y < 0 || y > 100) {
+          document.getElementById('resultado').innerText = "Por favor, preencha todos os campos de simulados abertos corretamente.";
+          return;
+        }
+        soma3 += y;
+      }
+      soma3 = soma3 / s2;
+
+      // Calculando a nota final
+      let somaT = (soma1 + soma2 + soma3) / 3;
+      let resultado = '';
+      if (somaT > 100) {
+        resultado = `Sua nota total em ${materia} foi de 100%.`;
+      } else {
+        resultado = `Sua nota total em ${materia} foi de ${somaT.toFixed(2)}%.`;
+      }
+
+      // Exibindo o resultado
+      document.getElementById('resultado').innerText = resultado;
+    }
+
+    // Atualizando os campos dinâmicos quando o número de entradas mudar
+    document.getElementById('N').addEventListener('input', function() {
+      let N = parseInt(this.value);
+      gerarCamposDinamicos('engajamento', N);
+    });
+
+    document.getElementById('simuladosFechados').addEventListener('input', function() {
+      let s1 = parseInt(this.value);
+      gerarCamposDinamicos('simuladoFechado', s1);
+    });
+
+    document.getElementById('simuladosAbertos').addEventListener('input', function() {
+      let s2 = parseInt(this.value);
+      gerarCamposDinamicos('simuladoAberto', s2);
+    });
+  </script>
+</body>
+</html>
